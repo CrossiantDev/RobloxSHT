@@ -1,78 +1,75 @@
-$Host.UI.RawUI.WindowTitle = "RobloxSHT - Панель управления"
+﻿$Host.UI.RawUI.WindowTitle = "RobloxSHT - Control Panel"
 
 function Show-Menu {
     Clear-Host
     Write-Host "====================================================" -ForegroundColor Cyan
-    Write-Host "             RobloxSHT - Панель управления          " -ForegroundColor Cyan
+    Write-Host "             RobloxSHT - Control Panel              " -ForegroundColor Cyan
     Write-Host "====================================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host " [1] Отправить изменения на GitHub (обновит плейс)" -ForegroundColor Yellow
-    Write-Host " [2] Забрать свежий код с GitHub" -ForegroundColor Green
-    Write-Host " [3] Запустить Rojo для связи с Roblox Studio" -ForegroundColor Magenta
-    Write-Host " [4] Установить плагин Rojo в Roblox Studio" -ForegroundColor Blue
-    Write-Host " [0] Выход" -ForegroundColor Gray
+    Write-Host " [1] Otpravit izmeneniya na GitHub (avtodeploy)" -ForegroundColor Yellow
+    Write-Host " [2] Zabrat svezhiy kod s GitHub" -ForegroundColor Green
+    Write-Host " [3] Zapustit Rojo dlya svyazi so Studio" -ForegroundColor Magenta
+    Write-Host " [4] Ustanovit plagin Rojo v Studio" -ForegroundColor Blue
+    Write-Host " [0] Vyhod" -ForegroundColor Gray
     Write-Host ""
     Write-Host "====================================================" -ForegroundColor Cyan
 }
 
 while ($true) {
     Show-Menu
-    $choice = Read-Host "Выберите пункт [0-4]"
+    $choice = Read-Host "Vvedite punkt [0-4]"
     
     switch ($choice) {
         "1" {
             Clear-Host
-            Write-Host "[1/3] Забираем свежие изменения..." -ForegroundColor Yellow
+            Write-Host "[1/3] Zabiraem svezhie izmeneniya..." -ForegroundColor Yellow
             git pull origin main
-            Write-Host "`n[2/3] Добавляем файлы..." -ForegroundColor Yellow
+            Write-Host "`n[2/3] Dobavlyaem fayly..." -ForegroundColor Yellow
             git add .
             $diff = git status --porcelain
             if (-not $diff) {
-                Write-Host "`nНет новых изменений для отправки." -ForegroundColor Green
+                Write-Host "`nNet novyh izmeneniy." -ForegroundColor Green
             } else {
-                Write-Host "`n[3/3] Отправляем изменения на GitHub..." -ForegroundColor Yellow
-                $msg = Read-Host "Краткое описание изменений (Enter для авто)"
+                Write-Host "`n[3/3] Otpravlyaem na GitHub..." -ForegroundColor Yellow
+                $msg = Read-Host "Opisanie (Enter dlya avto)"
                 if ([string]::IsNullOrWhiteSpace($msg)) { $msg = "Update project" }
-                git commit -m "$msg ($((Get-Date).ToString('dd.MM.yyyy HH:mm')))"
+                git commit -m "$msg"
                 git push origin main
-                Write-Host "`nГотово! Код отправлен, GitHub Actions обновляет плейс." -ForegroundColor Green
+                Write-Host "`nGotovo! Kod otpravlen." -ForegroundColor Green
             }
             Write-Host ""
-            Pause
+            cmd /c pause
         }
         "2" {
             Clear-Host
-            Write-Host "Получаем обновления с сервера..." -ForegroundColor Yellow
+            Write-Host "Poluchaem obnovleniya..." -ForegroundColor Yellow
             git pull origin main
-            Write-Host "`nГотово! Ваши файлы обновлены." -ForegroundColor Green
+            Write-Host "`nGotovo! Fayly obnovleny." -ForegroundColor Green
             Write-Host ""
-            Pause
+            cmd /c pause
         }
         "3" {
             Clear-Host
             Write-Host "====================================================" -ForegroundColor Magenta
-            Write-Host "Запуск Rojo сервера..." -ForegroundColor Magenta
-            Write-Host "Не закрывайте это окно, пока работаете в Roblox Studio!" -ForegroundColor Yellow
-            Write-Host "В Studio во вкладке Plugins нажмите Rojo -> Connect." -ForegroundColor Cyan
+            Write-Host "Zapusk Rojo na portu 34872..." -ForegroundColor Magenta
+            Write-Host "Ne zakryvayte eto okno, poka rabotaete v Studio!" -ForegroundColor Yellow
+            Write-Host "V Studio vo vkladke Plugins nazhmite Rojo -> Connect." -ForegroundColor Cyan
             Write-Host "====================================================" -ForegroundColor Magenta
             Write-Host ""
             rojo serve
-            Pause
+            cmd /c pause
         }
         "4" {
             Clear-Host
-            Write-Host "Установка плагина Rojo в Roblox Studio..." -ForegroundColor Blue
+            Write-Host "Ustanovka plagina Rojo..." -ForegroundColor Blue
             $p = "$env:LOCALAPPDATA\Roblox\Plugins"
             if (-not (Test-Path $p)) { New-Item -ItemType Directory -Path $p -Force }
             Invoke-WebRequest "https://github.com/rojo-rbx/rojo/releases/download/v7.7.1/Rojo.rbxm" -OutFile "$p\Rojo.rbxm"
-            Write-Host "Плагин успешно установлен в $p\Rojo.rbxm" -ForegroundColor Green
-            Pause
+            Write-Host "Plagin ustanovlen v $p\Rojo.rbxm" -ForegroundColor Green
+            cmd /c pause
         }
         "0" {
             exit
-        }
-        Default {
-            # continue loop
         }
     }
 }
