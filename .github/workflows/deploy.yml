@@ -1,0 +1,32 @@
+name: Publish to Roblox
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rojo
+        run: |
+          wget -q -O rojo.zip https://github.com/rojo-rbx/rojo/releases/download/v7.7.1/rojo-7.7.1-linux-x86_64.zip
+          sudo unzip -q -o rojo.zip -d /usr/local/bin
+          sudo chmod +x /usr/local/bin/rojo
+          rojo --version
+
+      - name: Build Place
+        run: |
+          rojo build default.project.json --output place.rbxl
+
+      - name: Upload and Publish to Roblox
+        run: |
+          curl -f -s -X POST \
+            -H "x-api-key: ${{ secrets.ROBLOX_API_KEY }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @place.rbxl \
+            "https://apis.roblox.com/universes/v1/${{ secrets.UNIVERSE_ID }}/places/${{ secrets.PLACE_ID }}/versions?versionType=Published"
